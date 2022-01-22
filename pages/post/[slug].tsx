@@ -4,6 +4,7 @@ import { sanityClient, urlFor } from "../../sanity";
 import { Post } from "../../typings";
 import PortableText from "react-portable-text";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { useState } from "react";
 
 interface IFormInput {
   _id: string;
@@ -17,6 +18,10 @@ interface Props {
 }
 
 function Post({ post }: Props) {
+  const [submitted, setSubmitted] = useState(false);
+
+  console.log(post);
+
   const {
     register,
     handleSubmit,
@@ -30,9 +35,11 @@ function Post({ post }: Props) {
     })
       .then(() => {
         console.log(data);
+        setSubmitted(true);
       })
       .catch((err) => {
         console.log(err);
+        setSubmitted(false);
       });
   };
 
@@ -44,7 +51,6 @@ function Post({ post }: Props) {
         src={urlFor(post.mainImage).url()!}
         alt=""
       />
-
       <article className="max-w-3xl mx-auto p-5">
         <h1 className="text-3xl mt-10 mb-3">{post.title}</h1>
         <h2 className="text-xl font-light text-gray-500 mb-2">
@@ -90,73 +96,103 @@ function Post({ post }: Props) {
           />
         </div>
       </article>
-
       <hr className="max-w-lg my-5 mx-auto border border-yellow-500" />
 
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col p-5 max-w-2xl mx-auto mb-10"
-      >
-        <h3 className="text-sm text-yellow-500">Enjoyed the article?</h3>
-        <h4 className="text-3xl font-bold">Leave a comment below!</h4>
-        <hr className="py-3 mt-2" />
-
-        <input {...register("_id")} type="hidden" name="_id" value={post._id} />
-
-        <label className="block mb-5">
-          <span className="text-gray-700">Name</span>
-          <input
-            {...register("name", { required: true })}
-            className="shadow border rounded py-2 px-3 form-input mt-1 block w-full ring-yellow-500 outline-none focus:ring"
-            placeholder="John Appleseed"
-            type="text"
-          />
-        </label>
-
-        <label className="block mb-5">
-          <span className="text-gray-700">Email</span>
-          <input
-            {...register("email", { required: true })}
-            className="shadow border rounded py-2 px-3 form-input mt-1 block w-full ring-yellow-500 outline-none focus:ring"
-            placeholder="John Appleseed"
-            type="email"
-          />
-        </label>
-
-        <label className="block mb-5">
-          <span className="text-gray-700">Comment</span>
-          <textarea
-            {...register("comment", { required: true })}
-            className="shadow border rounded py-2 px-3 form-textarea mt-1 block w-full ring-yellow-500 outline-none focus:ring"
-            placeholder="John Appleseed"
-            rows={8}
-          />
-        </label>
-
-        {/* errors will return when field validation fails */}
-        <div className="flex flex-col p-5">
-          {errors.name && (
-            <span className="text-red-500">- The Name Field is required</span>
-          )}
-
-          {errors.email && (
-            <span className="text-red-500">- The Email Field is required</span>
-          )}
-
-          {errors.comment && (
-            <span className="text-red-500">
-              - The Comment Field is required
-            </span>
-          )}
+      {submitted ? (
+        <div className="flex flex-col p-10 my-10 bg-yellow-500 text-white max-w-2xl mx-auto">
+          <h3 className="text-3xl font-bold">
+            Thank you for submitting your comment!
+          </h3>
+          <p>Once it has approved, it will appear below!</p>
         </div>
+      ) : (
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col p-5 max-w-2xl mx-auto mb-10"
+        >
+          <h3 className="text-sm text-yellow-500">Enjoyed the article?</h3>
+          <h4 className="text-3xl font-bold">Leave a comment below!</h4>
+          <hr className="py-3 mt-2" />
 
-        <input
-          type="submit"
-          name=""
-          id=""
-          className="shadow bg-yellow-500 hover:bg-yellow-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded cursor-pointer"
-        />
-      </form>
+          <input
+            {...register("_id")}
+            type="hidden"
+            name="_id"
+            value={post._id}
+          />
+
+          <label className="block mb-5">
+            <span className="text-gray-700">Name</span>
+            <input
+              {...register("name", { required: true })}
+              className="shadow border rounded py-2 px-3 form-input mt-1 block w-full ring-yellow-500 outline-none focus:ring"
+              placeholder="John Appleseed"
+              type="text"
+            />
+          </label>
+
+          <label className="block mb-5">
+            <span className="text-gray-700">Email</span>
+            <input
+              {...register("email", { required: true })}
+              className="shadow border rounded py-2 px-3 form-input mt-1 block w-full ring-yellow-500 outline-none focus:ring"
+              placeholder="John Appleseed"
+              type="email"
+            />
+          </label>
+
+          <label className="block mb-5">
+            <span className="text-gray-700">Comment</span>
+            <textarea
+              {...register("comment", { required: true })}
+              className="shadow border rounded py-2 px-3 form-textarea mt-1 block w-full ring-yellow-500 outline-none focus:ring"
+              placeholder="John Appleseed"
+              rows={8}
+            />
+          </label>
+
+          {/* errors will return when field validation fails */}
+          <div className="flex flex-col p-5">
+            {errors.name && (
+              <span className="text-red-500">- The Name Field is required</span>
+            )}
+
+            {errors.email && (
+              <span className="text-red-500">
+                - The Email Field is required
+              </span>
+            )}
+
+            {errors.comment && (
+              <span className="text-red-500">
+                - The Comment Field is required
+              </span>
+            )}
+          </div>
+
+          <input
+            type="submit"
+            name=""
+            id=""
+            className="shadow bg-yellow-500 hover:bg-yellow-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded cursor-pointer"
+          />
+        </form>
+      )}
+
+      {/* Comments */}
+      <div className="flex flex-col p-10 my-10 max-w-2xl mx-auto shadow-yellow-500 shadow space-y-2">
+        <h3 className="text-4xl">Comments</h3>
+        <hr className="pb-2" />
+
+        {post.comments.map((comment) => (
+          <div key={comment._id}>
+            <p>
+              <span className="text-yellow-500">{comment.name}:</span>{" "}
+              {comment.comment}
+            </p>
+          </div>
+        ))}
+      </div>
     </main>
   );
 }
