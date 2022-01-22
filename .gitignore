@@ -5,6 +5,9 @@
 /.pnp
 .pnp.js
 
+#sanity
+sanitybuild/node_modules
+
 # testing
 /coverage
 
